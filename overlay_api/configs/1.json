@@ -1,0 +1,90 @@
+{
+    "imgWidth": "2000",
+    "globalOpacity": "80",
+    "overlays": [
+        {
+            "id": "t3",
+            "text": "NGUYỄN TÙNG SƠN",
+            "top": 35,
+            "left": 45.64,
+            "font": "times",
+            "size": 26,
+            "weight": "700",
+            "ls": -0.8,
+            "opacity": 0.9,
+            "blur": 0.6,
+            "rot": -2,
+            "color": "#000"
+        },
+        {
+            "id": "t5",
+            "text": "20/08/2001",
+            "top": 46.15,
+            "left": 45.98,
+            "font": "times",
+            "size": 26,
+            "weight": "700",
+            "ls": 0.3,
+            "opacity": 0.9,
+            "blur": 0.6,
+            "rot": -2,
+            "color": "#000"
+        },
+        {
+            "id": "t6",
+            "text": "P326102",
+            "top": 25.55,
+            "left": 72.32,
+            "font": "times",
+            "size": 26,
+            "weight": "700",
+            "ls": 0.3,
+            "opacity": 0.9,
+            "blur": 0.6,
+            "rot": -2,
+            "color": "#000"
+        },
+        {
+            "id": "t7",
+            "text": "0160201202120",
+            "top": 52.75,
+            "left": 65.84,
+            "font": "times",
+            "size": 26,
+            "weight": "700",
+            "ls": 0.3,
+            "opacity": 0.9,
+            "blur": 0.6,
+            "rot": -2,
+            "color": "#000"
+        },
+        {
+            "id": "t8",
+            "text": "NGUYEN<<TUNG<SON",
+            "top": 78.6,
+            "left": 33.49,
+            "font": "911Fonts.com_TimeRomanNormal__-_911fonts.com_fonts_rsxd (1)",
+            "size": 26,
+            "weight": "700",
+            "ls": -1.6,
+            "opacity": 0.84,
+            "blur": 0.5,
+            "rot": -1,
+            "color": "#000"
+        }
+    ],
+    "avatar": {
+        "top": "48.88",
+        "left": "35.38",
+        "width": "15",
+        "opacity": "90",
+        "bright": "1",
+        "contrast": "0.8",
+        "radius": "4",
+        "rotate": "-2",
+        "zoom": "100",
+        "feather": "0",
+        "trim": true,
+        "trimThreshold": "14"
+    }
+}
