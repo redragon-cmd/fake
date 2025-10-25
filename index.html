@@ -1,26 +1,1274 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Trang web đầu tiên của tôi</title>
-  <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 80px;
-    }
-    h1 {
-      color: #e63946;
-    }
-    p {
-      color: #333;
-      font-size: 18px;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Overlay Pro – Drag Fix + Alpha Trim + Save</title>
+    <style>
+        :root {
+            --w: 1200px;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 18px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+            background: #0b0f12;
+            color: #e5e7eb;
+        }
+
+        .wrap {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            max-width: 1760px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            width: 640px;
+            background: #0f1419;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid #1f2937;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, .45);
+            position: sticky;
+            top: 18px;
+        }
+
+        .panel h2 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #f3f4f6;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #d1d5db;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        input[type="color"] {
+            width: 100%;
+            margin-top: 6px;
+            padding: 9px 11px;
+            border-radius: 10px;
+            background: #0c1116;
+            color: #e5e7eb;
+            border: 1px solid #233044;
+            outline: none;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #3b82f6;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #2563eb, #1d4ed8);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, .35);
+        }
+
+        .btn:hover {
+            filter: brightness(1.05);
+        }
+
+        .btn.ghost {
+            background: #111827;
+            color: #e5e7eb;
+            box-shadow: none;
+            border: 1px solid #1f2937;
+        }
+
+        .btn.danger {
+            background: linear-gradient(180deg, #b91c1c, #991b1b);
+        }
+
+        .btn.small {
+            padding: 6px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 6px;
+        }
+
+        .canvas {
+            position: relative;
+            width: var(--w);
+            max-width: calc(100vw - 520px);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid #1f2937;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, .45);
+            background: #0c1116;
+        }
+
+        .stage {
+            position: relative;
+        }
+
+        .bg2 {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 1;
+            filter: none;
+        }
+
+        #bg {
+            position: relative;
+            width: 100%;
+            height: auto;
+            display: block;
+            z-index: 1;
+        }
+
+        /* Text overlay */
+        .overlay {
+            position: absolute;
+            transform: translate(0, -50%) rotate(0deg);
+            white-space: nowrap;
+            user-select: none;
+            cursor: move;
+            z-index: 3;
+            padding: 1px 3px;
+            color: #000;
+            text-shadow: .2px .2px 0 rgba(0, 0, 0, .15);
+        }
+
+        /* Avatar wrapper – không viền/không shadow */
+        #avatarBox {
+            position: absolute;
+            top: 20%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+            width: 18%;
+            z-index: 2;
+            cursor: move;
+            display: none;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: none;
+            border: none;
+            background: transparent;
+        }
+
+        #avatar {
+            width: 100%;
+            height: auto;
+            display: block;
+            transform-origin: center center;
+            filter: brightness(1) contrast(1);
+            -webkit-mask-image: none;
+            mask-image: none;
+            /* feather sẽ set động */
+            border: none;
+            background: transparent;
+        }
+
+        .section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed #1f2937;
+        }
+
+        .mini {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .item {
+            background: #0b0f12;
+            border: 1px solid #1f2937;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        /* PANEL tự cuộn */
+        .panel{ max-height: calc(100vh - 36px); overflow:auto; }
+
+        /* Danh sách item gọn */
+        #textsPanel{ display:grid; gap:8px; }
+
+        /* Dùng <details> làm accordion */
+        .item{ padding:0; border:0; background:transparent; }
+        .item > summary{
+        list-style:none; cursor:pointer;
+        display:flex; align-items:center; justify-content:space-between;
+        gap:8px; padding:8px 10px;
+        background:#0c1116; border:1px solid #1f2937; border-radius:10px;
+        }
+        .item[open] > summary{ border-bottom-left-radius:0; border-bottom-right-radius:0; }
+        .item .item-body{
+        padding:10px; border:1px solid #1f2937; border-top:0;
+        border-bottom-left-radius:10px; border-bottom-right-radius:10px;
+        background:#0b0f12;
+        }
+
+        /* Chế độ compact: input nhỏ lại */
+        .compact input[type="text"],
+        .compact input[type="number"],
+        .compact select{ padding:6px 8px; font-size:13px; }
+        .compact .grid{ gap:8px; }
+        .compact .item .item-body{ padding:8px; }
+        .compact .btn.small{ padding:4px 6px; font-size:11px; }
+
+        .item-title{
+        font-weight:700; font-size:13px; color:#e5e7eb;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px;
+        }
+        .item-quick{ display:flex; gap:6px; }
+        /* Ảnh lớp phủ */
+        .imgOverlay{
+          position:absolute;
+          top:50%; left:50%;
+          transform:translate(-50%,-50%) rotate(0deg);
+          width:50%;
+          opacity:1;
+          z-index:2;                 /* dưới lớp chữ (z=3) */
+          mix-blend-mode: normal;    /* có thể đổi trong UI */
+          pointer-events:auto; user-select:none; cursor:move;
+        }
+
+
+
+    </style>
 </head>
+
 <body>
-  <h1>Xin chào! 👋</h1>
-  <p>Đây là trang web đầu tiên của tôi được lưu trữ miễn phí trên GitHub Pages!</p>
+    <div class="wrap">
+        <div class="panel">
+            <h2>Overlay Pro (Drag Fix + Alpha Trim)</h2>
+
+            <label>Ảnh nền phụ (sau ảnh chính)</label>
+            <input id="bg2file" type="file" accept="image/*">
+
+            <label>Ảnh chính</label>
+            <input id="bgfile" type="file" accept="image/*">
+
+            <div class="grid">
+                <div>
+                    <label class="mini">Kích thước ảnh (px)</label>
+                    <input id="imgWidth" type="number" value="1200" min="400" max="3000">
+                </div>
+                <div>
+                    <label class="mini">Độ mờ chữ (%)</label>
+                    <input id="globalOpacity" type="range" min="0" max="100" value="90">
+                </div>
+            </div>
+
+            <div class="section"></div>
+
+            <div class="row" style="justify-content:space-between">
+                <label style="margin:0">Văn bản (nhiều lớp)</label>
+                <button class="btn small" id="addTextBtn">+ Thêm văn bản</button>
+            </div>
+
+
+            <div id="textsPanel"></div>
+            <div class="hint">Mỗi văn bản có font/size/nhòe/letter-spacing/vị trí và <b>nghiêng (°)</b>. Kéo trực tiếp
+                trên
+                ảnh.</div>
+
+            <div class="section"></div>
+
+            <label>Ảnh đại diện (PNG đã xoá nền)</label>
+            <input id="avatarFile" type="file" accept="image/*">
+            <div class="grid">
+                <div><label class="mini">Top (%)</label> <input id="avatarTop" type="number" step="0.1" value="20">
+                </div>
+                <div><label class="mini">Left (%)</label> <input id="avatarLeft" type="number" step="0.1" value="75">
+                </div>
+                <div><label class="mini">Rộng (% canvas)</label><input id="avatarWidth" type="number" step="0.5" value="18">
+                </div>
+                <div><label class="mini">Độ mờ (%)</label> <input id="avatarOpacity" type="range" min="0" max="100" value="100">
+                </div>
+                <div><label class="mini">Sáng (0–2)</label> <input id="avatarBright" type="number" step="0.05" value="1">
+                </div>
+                <div><label class="mini">Tương phản (0–2)</label><input id="avatarContrast" type="number" step="0.05" value="1">
+                </div>
+                <div><label class="mini">Bo góc (px)</label> <input id="avatarRadius" type="number" step="1" value="10">
+                </div>
+                <div><label class="mini">Nghiêng (°)</label> <input id="avatarRotate" type="range" min="-35" max="35" step="1" value="0">
+                </div>
+            </div>
+            <div class="grid">
+                <div><label class="mini">Zoom avatar (%)</label><input id="avatarZoom" type="number" step="1" value="100">
+                </div>
+                <div><label class="mini">Feather mép (px)</label><input id="avatarFeather" type="number" step="1" value="0">
+                </div>
+            </div>
+
+            <div class="row" style="margin-top:8px">
+                <div style="flex:1">
+                    <label class="mini">Trim viền trong suốt</label>
+                    <input id="avatarTrim" type="checkbox" checked>
+                </div>
+                <div style="flex:1">
+                    <label class="mini">Ngưỡng alpha (0–255)</label>
+                    <input id="avatarTrimThreshold" type="number" min="0" max="255" step="1" value="12">
+                </div>
+            </div>
+            <div class="row">
+                <button class="btn ghost small" id="retrimBtn">↻ Trim lại ảnh</button>
+                <a id="downloadTrimBtn" class="btn small" download="avatar_trimmed.png" href="#"
+                    style="display:none">Tải PNG
+                    avatar đã cắt</a>
+            </div>
+
+            <div class="section"></div>
+            <div class="section"></div>
+            <div class="row" style="justify-content:space-between">
+              <label style="margin:0">Lớp phủ ảnh (nhiều lớp)</label>
+              <button class="btn small" id="addImgLayerBtn">+ Thêm lớp phủ</button>
+            </div>
+            <div id="imgLayersPanel"></div>
+
+
+
+            <label>Preset tên (lưu lên host)</label>
+            <input id="presetName" type="text" placeholder="ví dụ: layout_demo_01">
+            <div class="row">
+                <button class="btn" id="saveServerBtn">Lưu JSON</button>
+                <button class="btn ghost" id="saveCssServerBtn">Lưu CSS</button>
+            </div>
+            <div class="row">
+                <select id="presetSelect" style="flex:1"><option value="">— Chọn preset trên host —</option></select>
+                <button class="btn ghost" id="loadServerBtn" style="flex:0 0 110px">Tải preset</button>
+            </div>
+            <div class="hint">Cần các API PHP: <code>/overlay_api/list_configs.php</code>, <code>save_config.php</code>,
+                <code>get_config.php</code>, <code>save_css.php</code>.
+            </div>
+        </div>
+
+        <div class="canvas" id="canvas">
+            <div class="stage" id="stage">
+                <img class="bg2" id="bg2" alt="Ảnh nền phụ">
+                <img id="bg" alt="Ảnh chính" src="">
+                <div id="avatarBox"><img id="avatar" alt="Ảnh đại diện"></div>
+                <!-- text overlay sẽ sinh động -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ===== Helpers ===== */
+const $ = id => document.getElementById(id);
+const STORAGE_KEY = 'overlay_pro_drag_trim_v2';
+const API_BASE = '/overlay_api';
+// ĐƯỜNG DẪN ẢNH LỚP PHỦ MẶC ĐỊNH TRÊN HOST
+const DEFAULT_IMG_LAYER_SRC = 'https://labs.com-exchange.ltd/usa2.png';
+// nếu bạn để file ở gốc site: const DEFAULT_IMG_LAYER_SRC = '/usa2.png';
+let availableFonts = [];
+let overlays = [];   // {id,text,top,left,font,size,weight,ls,opacity,blur,color,rot}
+let overlayIdSeq = 1;
+
+let avatarOriginalDataURL = null; // giữ bản gốc để trim lại
+let avatarTrimmedDataURL  = null;
+// ===== Image Overlays =====
+let imgLayers = [];    
+        // [{id, src, top, left, width, opacity, rot, blend, z}]
+let imgLayerIdSeq = 1;
+function persist(){
+  const cfg = {
+    imgWidth: $('imgWidth').value,
+    globalOpacity: $('globalOpacity').value,
+    overlays,
+    imgLayers,   // <= thêm dòng này
+    avatar: {
+      shown: getComputedStyle($('avatarBox')).display !== 'none',
+      top: $('avatarTop').value, left: $('avatarLeft').value,
+      width: $('avatarWidth').value, opacity: $('avatarOpacity').value,
+      bright: $('avatarBright').value, contrast: $('avatarContrast').value,
+      radius: $('avatarRadius').value, rotate: $('avatarRotate').value,
+      zoom: $('avatarZoom').value, feather: $('avatarFeather').value
+    }
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+}
+
+function applyImgLayerStyle(el, L){
+  el.style.top   = (L.top   ?? 50) + '%';
+  el.style.left  = (L.left  ?? 50) + '%';
+  el.style.width = (L.width ?? 50) + '%';
+  el.style.opacity = (L.opacity ?? 1);
+  el.style.transform = `translate(-50%, -50%) rotate(${L.rot ?? 0}deg)`;
+  el.style.mixBlendMode = L.blend || 'normal';
+  el.style.zIndex = L.z ?? 2;
+}
+
+function createImgLayerEl(L){
+  const el = document.createElement('img');
+  el.className = 'imgOverlay';
+  el.dataset.id = L.id;
+  el.alt = 'Image overlay';
+  if (L.src) el.src = L.src;
+  el.onerror = () => alert('Không tải được ảnh lớp phủ: ' + (L.src || ''));
+  applyImgLayerStyle(el, L);
+  $('stage').appendChild(el);
+
+  // kéo-thả theo TÂM (không bị nhảy)
+  makeDraggableCenter(el, (top, left)=>{
+    L.top = +top.toFixed(2);
+    L.left = +left.toFixed(2);
+    const row = $('imgrow_'+L.id);
+    if(row){ row.querySelector('.in_top').value  = L.top;
+             row.querySelector('.in_left').value = L.left; }
+    persist();
+  });
+  return el;
+}
+
+function addImgLayer(initial = {}, openByDefault = false){
+  const L = {
+    id: 'img' + (imgLayerIdSeq++),
+    src: initial.src || '',
+    top: initial.top ?? 50,
+    left: initial.left ?? 50,
+    width: initial.width ?? 20,
+    opacity: initial.opacity ?? 1,
+    rot: initial.rot ?? 0,
+    blend: initial.blend || 'normal',
+    z: initial.z ?? 2,
+  };
+  if (openByDefault) L.__open = true;
+  imgLayers.push(L);
+  createImgLayerEl(L);
+  addImgLayerItemUI(L);
+  delete L.__open;
+  persist();
+  return L;
+}
+
+function removeImgLayer(id){
+  imgLayers = imgLayers.filter(x => x.id !== id);
+  document.querySelector(`.imgOverlay[data-id="${id}"]`)?.remove();
+  $('imgrow_'+id)?.remove();
+  persist();
+}
+
+function updateImgLayerFromInputs(id){
+  const L = imgLayers.find(x=>x.id===id); if(!L) return;
+  const row = $('imgrow_'+id);
+  const src   = row.querySelector('.in_src').value.trim();
+  const top   = +row.querySelector('.in_top').value  || 50;
+  const left  = +row.querySelector('.in_left').value || 50;
+  const width = +row.querySelector('.in_w').value    || 50;
+  const op    = (+row.querySelector('.in_op').value || 100)/100;
+  const rot   = +row.querySelector('.in_rot').value || 0;
+  const blend = row.querySelector('.in_blend').value || 'normal';
+  const z     = +row.querySelector('.in_z').value || 2;
+
+  Object.assign(L, {src, top, left, width, opacity:op, rot, blend, z});
+  const el = document.querySelector(`.imgOverlay[data-id="${id}"]`);
+  if (el){
+    if (src) el.src = src;
+    applyImgLayerStyle(el, L);
+  }
+  persist();
+}
+
+function addImgLayerItemUI(L){
+  const wrap = document.createElement('details');
+  wrap.className = 'item';
+  wrap.id = 'imgrow_'+L.id;
+  wrap.open = !!L.__open;
+
+  wrap.innerHTML = `
+    <summary>
+      <span class="item-title">Lớp phủ #${L.id}</span>
+      <span class="item-quick">
+        <button class="btn ghost small btn_toggle" type="button">Thu gọn</button>
+        <button class="btn danger small btn_del" type="button">Xóa</button>
+      </span>
+    </summary>
+    <div class="item-body">
+      <label>Ảnh lớp phủ (URL hoặc chọn file)</label>
+      <input class="in_src" type="text" placeholder="https://...png" value="${L.src||''}">
+      <input class="in_file" type="file" accept="image/*">
+
+      <div class="grid">
+        <div><label class="mini">Top (%)</label>    <input class="in_top" type="number" step="0.1" value="${L.top}"></div>
+        <div><label class="mini">Left (%)</label>   <input class="in_left" type="number" step="0.1" value="${L.left}"></div>
+        <div><label class="mini">Rộng (% canvas)</label><input class="in_w" type="number" step="0.5" value="${L.width}"></div>
+        <div><label class="mini">Độ mờ (%)</label>  <input class="in_op" type="range" min="0" max="100" value="${Math.round((L.opacity??1)*100)}"></div>
+        <div><label class="mini">Nghiêng (°)</label><input class="in_rot" type="range" min="-180" max="180" step="1" value="${L.rot}"></div>
+        <div>
+          <label class="mini">Blend</label>
+          <select class="in_blend">
+            <option ${L.blend==='normal'?'selected':''}>normal</option>
+            <option ${L.blend==='multiply'?'selected':''}>multiply</option>
+            <option ${L.blend==='screen'?'selected':''}>screen</option>
+            <option ${L.blend==='overlay'?'selected':''}>overlay</option>
+            <option ${L.blend==='darken'?'selected':''}>darken</option>
+            <option ${L.blend==='lighten'?'selected':''}>lighten</option>
+          </select>
+        </div>
+        <div><label class="mini">Tầng (z-index)</label><input class="in_z" type="number" min="1" max="10" value="${L.z}"></div>
+      </div>
+    </div>
+  `;
+  $('imgLayersPanel').appendChild(wrap);
+
+  // Toggle đóng/mở riêng item
+  const btnToggle = wrap.querySelector('.btn_toggle');
+  const setToggleLabel = ()=> btnToggle.textContent = wrap.open ? 'Thu gọn' : 'Mở';
+  setToggleLabel();
+  btnToggle.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); wrap.open=!wrap.open; setToggleLabel(); });
+  wrap.addEventListener('toggle', setToggleLabel);
+
+  // File → đọc thành dataURL để lưu/persist
+  wrap.querySelector('.in_file').addEventListener('change', (e)=>{
+    const f = e.target.files?.[0]; if(!f) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      const dataURL = ev.target.result;
+      wrap.querySelector('.in_src').value = dataURL;
+      updateImgLayerFromInputs(L.id);
+    };
+    reader.readAsDataURL(f);
+  });
+
+  // Bind các input
+  wrap.querySelectorAll('input,select').forEach(inp=>{
+    inp.addEventListener('input', ()=> updateImgLayerFromInputs(L.id));
+  });
+}
+
+/* ===== Backgrounds ===== */
+$('bg2file').addEventListener('change', e=>{
+  const f=e.target.files?.[0]; if(!f) return; $('bg2').src = URL.createObjectURL(f);
+});
+$('bgfile').addEventListener('change', e=>{
+  const f=e.target.files?.[0]; if(!f) return; $('bg').src = URL.createObjectURL(f);
+});
+
+/* ===== Avatar upload + trim ===== */
+$('avatarFile').addEventListener('change', async e=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = async ev=>{
+    avatarOriginalDataURL = ev.target.result;
+    $('avatarBox').style.display='block';
+    if ($('avatarTrim').checked) {
+      await trimAndSetAvatar();
+    } else {
+      avatarTrimmedDataURL = avatarOriginalDataURL;
+      $('avatar').src = avatarTrimmedDataURL;
+      $('downloadTrimBtn').href = avatarTrimmedDataURL;
+      $('downloadTrimBtn').style.display = 'inline-block';
+    }
+    applyAvatar(); persist();
+  };
+  reader.readAsDataURL(f);
+});
+$('retrimBtn').addEventListener('click', async ()=>{
+  if(!avatarOriginalDataURL){ alert('Chưa có ảnh avatar.'); return; }
+  await trimAndSetAvatar(); applyAvatar(); persist();
+});
+
+/* Trim bằng canvas: cắt mép trong suốt (alpha <= threshold) */
+async function trimAndSetAvatar(){
+  const threshold = Math.max(0, Math.min(255, +$('avatarTrimThreshold').value||12));
+  const {canvas} = await loadImageToCanvas(avatarOriginalDataURL);
+  const ctx = canvas.getContext('2d');
+  const {data,width,height} = ctx.getImageData(0,0,canvas.width,canvas.height);
+
+  let top=0, left=0, right=width-1, bottom=height-1;
+  const alphaAt = (x,y)=> data[(y*width + x)*4 + 3];
+
+  // tìm top
+  outerTop: for(let y=0;y<height;y++){
+    for(let x=0;x<width;x++){ if(alphaAt(x,y)>threshold){ top=y; break outerTop; } }
+  }
+  // bottom
+  outerBottom: for(let y=height-1;y>=0;y--){
+    for(let x=0;x<width;x++){ if(alphaAt(x,y)>threshold){ bottom=y; break outerBottom; } }
+  }
+  // left
+  outerLeft: for(let x=0;x<width;x++){
+    for(let y=top;y<=bottom;y++){ if(alphaAt(x,y)>threshold){ left=x; break outerLeft; } }
+  }
+  // right
+  outerRight: for(let x=width-1;x>=0;x--){
+    for(let y=top;y<=bottom;y++){ if(alphaAt(x,y)>threshold){ right=x; break outerRight; } }
+  }
+
+  const w = Math.max(1, right-left+1);
+  const h = Math.max(1, bottom-top+1);
+  const out = document.createElement('canvas');
+  out.width = w; out.height = h;
+  out.getContext('2d').drawImage(canvas, left, top, w, h, 0, 0, w, h);
+  avatarTrimmedDataURL = out.toDataURL('image/png');
+  $('avatar').src = avatarTrimmedDataURL;
+  $('downloadTrimBtn').href = avatarTrimmedDataURL;
+  $('downloadTrimBtn').style.display = 'inline-block';
+}
+
+function loadImageToCanvas(src){
+  return new Promise((resolve)=>{
+    const img = new Image(); img.onload=()=>{
+      const c=document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight;
+      c.getContext('2d').drawImage(img,0,0);
+      resolve({canvas:c});
+    };
+    img.src = src;
+  });
+}
+
+/* ===== Avatar style (zoom/feather/rotate/opacity/pos) ===== */
+function applyAvatar(){
+  const box = $('avatarBox');
+  const img = $('avatar');
+
+  // vị trí & kích thước (neo tâm)
+  const top  = +$('avatarTop').value || 20;
+  const left = +$('avatarLeft').value || 75;
+  const w    = Math.max(2, Math.min(90, +$('avatarWidth').value||18));
+  const rad  = Math.max(0, +$('avatarRadius').value||10);
+
+  box.style.top  = top + '%';
+  box.style.left = left + '%';
+  box.style.width= w + '%';
+  box.style.borderRadius = rad + 'px';
+  box.style.transform = 'translate(-50%,-50%)'; // đảm bảo neo tâm
+
+  // ảnh bên trong
+  const op   = (+$('avatarOpacity').value||100)/100;
+  const br   = Math.max(0, +$('avatarBright').value||1);
+  const ct   = Math.max(0, +$('avatarContrast').value||1);
+  const rot  = +$('avatarRotate').value||0;
+  const zoom = Math.max(10, +$('avatarZoom').value||100)/100;
+  const feather = Math.max(0, +$('avatarFeather').value||0);
+
+  img.style.opacity = op;
+  img.style.filter  = `brightness(${br}) contrast(${ct})`;
+  img.style.transform = `scale(${zoom}) rotate(${rot}deg)`;
+  if (feather>0){
+    const fpx = feather+'px';
+    img.style.webkitMaskImage = `radial-gradient(closest-side, #000 calc(100% - ${fpx}), transparent 100%)`;
+    img.style.maskImage = `radial-gradient(closest-side, #000 calc(100% - ${fpx}), transparent 100%)`;
+  } else {
+    img.style.webkitMaskImage = 'none';
+    img.style.maskImage = 'none';
+  }
+}
+
+/* ===== Canvas size & text opacity global ===== */
+function applyGlobals(){
+  const w = Math.max(400, Math.min(3000, parseInt($('imgWidth').value)||1200));
+  document.documentElement.style.setProperty('--w', w + 'px');
+  const op = (+$('globalOpacity').value||90)/100;
+  document.querySelectorAll('.overlay').forEach(el=> el.style.opacity = op);
+}
+
+/* ===== Fonts (/list_fonts.php) ===== */
+async function loadFonts(){
+  try{
+    const res = await fetch('/list_fonts.php',{cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const files = await res.json();
+    availableFonts = files.map(f=>f.replace(/\.(ttf|otf|woff2?|eot)$/i,''));
+    files.forEach(file=>{
+      const name = file.replace(/\.(ttf|otf|woff2?|eot)$/i,'');
+      let format='truetype';
+      if(/\.otf$/i.test(file)) format='opentype';
+      if(/\.woff2$/i.test(file)) format='woff2';
+      if(/\.woff$/i.test(file))  format='woff';
+      if(/\.eot$/i.test(file))   format='embedded-opentype';
+      const style=document.createElement('style');
+      style.textContent=`@font-face{font-family:"${name}";src:url("/font/${file}") format("${format}");font-weight:100 900;font-style:normal;font-display:swap;}`;
+      document.head.appendChild(style);
+    });
+  }catch(e){ console.warn('Không load được /list_fonts.php', e); }
+}
+
+/* ===== Text overlays (rotate + clone) ===== */
+function createOverlayEl(ov){
+  const el = document.createElement('div');
+  el.className='overlay'; el.dataset.id=ov.id; el.textContent=ov.text || 'VĂN BẢN';
+  applyOverlayStyle(el, ov);
+  $('stage').appendChild(el);
+  makeDraggableText(el, (top,left)=>{
+    ov.top = +top.toFixed(2);
+    ov.left= +left.toFixed(2);
+    updateItemInputs(ov.id);
+    persist();
+  });
+  return el;
+}
+function applyOverlayStyle(el, ov){
+  const op = (+$('globalOpacity').value || 90) / 100;
+  el.style.top = (ov.top ?? 50) + '%';
+  el.style.left = (ov.left ?? 50) + '%';
+  el.style.fontFamily = ov.font ? `"${ov.font}", Arial, sans-serif` : 'Arial, sans-serif';
+  el.style.fontSize = (ov.size ?? 32) + 'px';
+  el.style.fontWeight = ov.weight ?? 700;
+  el.style.letterSpacing = (ov.ls ?? 0) + 'px';
+  el.style.opacity = ov.opacity ?? op;
+  el.style.color = ov.color || '#000';
+  el.style.transform = `translate(0,-50%) rotate(${ov.rot ?? 0}deg)`;
+
+  // NEW: combine blur + contrast (order: contrast trước/ sau đều ok, mình để contrast trước)
+  const ct = ov.contrast ?? 1;
+  const blur = ov.blur ?? 0;
+  el.style.filter = `contrast(${ct}) blur(${blur}px)`; // NEW
+
+}
+// openByDefault = true -> khi vừa thêm mới thì mở accordion; khi restore thì để false
+function addOverlay(initial = {}, openByDefault = false){
+  const ov = {
+    id: 't' + (overlayIdSeq++),
+    text: initial.text || 'VĂN BẢN',
+    top: initial.top ?? 50,
+    left: initial.left ?? 50,
+    font: initial.font || (availableFonts[0] || ''),
+    size: initial.size ?? 32,
+    weight: initial.weight ?? 700,
+    ls: initial.ls ?? 0.3,
+    opacity: initial.opacity ?? ((+$('globalOpacity').value || 90) / 100),
+    blur: initial.blur ?? 0,
+    rot: initial.rot ?? 0,
+    color: initial.color || '#000000',
+    color: '#000',
+    contrast: initial.contrast ?? 1,   // NEW: contrast
+  };
+
+  // cờ mở accordion cho UI (details) – chỉ dùng lúc render
+  if (openByDefault) ov.__open = true;
+
+  overlays.push(ov);
+  createOverlayEl(ov);
+  addOverlayItemUI(ov);
+
+  // xóa cờ tạm sau khi đã render UI
+  delete ov.__open;
+
+  persist();
+  return ov;
+}
+
+function duplicateOverlay(id){
+  const src=overlays.find(o=>o.id===id); if(!src) return;
+  const clone={...src, id:'t'+(overlayIdSeq++), top:Math.min(100,src.top+2), left:Math.min(100,src.left+2)};
+  overlays.push(clone); createOverlayEl(clone); addOverlayItemUI(clone); persist();
+}
+function removeOverlay(id){
+  overlays = overlays.filter(o=>o.id!==id);
+  document.querySelector(`.overlay[data-id="${id}"]`)?.remove();
+  document.getElementById('row_'+id)?.remove();
+  persist();
+}
+function updateOverlayFromInputs(id){
+  const ov = overlays.find(o => o.id === id); 
+  if (!ov) return;
+  const row = $('row_' + id);
+  if (!row) return;
+
+  const text   = row.querySelector('.inp_text').value.trim() || 'VĂN BẢN';
+  const font   = row.querySelector('.sel_font').value || '';
+  const size   = +row.querySelector('.inp_size').value || 32;
+  const weight = row.querySelector('.sel_weight').value || 700;
+  const ls     = +row.querySelector('.inp_ls').value || 0;
+  const blur   = +row.querySelector('.inp_blur').value || 0;
+
+  // contrast
+  const cRaw     = +row.querySelector('.inp_contrast')?.value;
+  const contrast = Number.isFinite(cRaw) ? cRaw : (ov.contrast ?? 1);
+
+  const rot   = +row.querySelector('.inp_rot').value || 0;
+  const top   = +row.querySelector('.inp_top').value || 50;
+  const left  = +row.querySelector('.inp_left').value || 50;
+
+  // NEW: color
+  const color = row.querySelector('.inp_color')?.value || ov.color || '#000000';
+
+  Object.assign(ov, { text, font, size, weight, ls, blur, contrast, rot, top, left, color });
+
+  const el = document.querySelector(`.overlay[data-id="${id}"]`);
+  if (el) {
+    el.textContent = text;
+    applyOverlayStyle(el, ov);
+  }
+
+  persist();
+}
+
+function updateItemInputs(id){
+  const ov=overlays.find(o=>o.id===id); if(!ov) return;
+  const row=$('row_'+id); if(!row) return;
+  row.querySelector('.inp_top').value=ov.top;
+  row.querySelector('.inp_left').value=ov.left;
+}
+function escapeHTML(s){ return s.replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+function addOverlayItemUI(ov){
+  const wrap = document.createElement('details');
+  wrap.className = 'item';
+  wrap.id = 'row_'+ov.id;
+  wrap.open = !!ov.__open; // mở khi vừa thêm mới
+
+  wrap.innerHTML = `
+    <summary>
+      <span class="item-title">#${ov.id} – <span class="preview">${escapeHTML(ov.text).slice(0,30) || 'VĂN BẢN'}</span></span>
+      <span class="item-quick">
+        <button class="btn ghost small btn_toggle" type="button">Thu gọn</button>
+        <button class="btn ghost small btn_clone"  type="button">Nhân bản</button>
+        <button class="btn danger small btn_del"   type="button">Xóa</button>
+      </span>
+    </summary>
+    <div class="item-body">
+      <label>Nội dung</label>
+      <input class="inp_text" type="text" value="${escapeHTML(ov.text)}">
+      <div class="grid">
+        <div><label class="mini">Font</label><select class="sel_font"></select></div>
+        <div><label class="mini">Cỡ (px)</label><input class="inp_size" type="number" value="${ov.size}" min="8" max="160"></div>
+        <div><label class="mini">Độ đậm</label><select class="sel_weight">
+          <option>400</option><option>500</option><option ${ov.weight==700?'selected':''}>700</option><option>800</option><option>900</option>
+        </select></div>
+        <div><label class="mini">Letter-space (px)</label><input class="inp_ls" type="number" step="0.1" value="${ov.ls}"></div>
+        <div><label class="mini">Nhòe (px)</label><input class="inp_blur" type="range" min="0" max="6" step="0.1" value="${ov.blur}"></div>
+        <div><label class="mini">Tương phản</label>
+          <input class="inp_contrast" type="range" min="0" max="3" step="0.05" value="${ov.contrast ?? 1}">
+        </div>
+        <div><label class="mini">Màu chữ</label>
+          <input class="inp_color" type="color" value="${ov.color || '#000000'}">
+        </div>
+        <div><label class="mini">Nghiêng (°)</label><input class="inp_rot" type="range" min="-35" max="35" step="1" value="${ov.rot}"></div>
+        <div><label class="mini">Top (%)</label><input class="inp_top" type="number" step="0.1" value="${ov.top}"></div>
+        <div><label class="mini">Left (%)</label><input class="inp_left" type="number" step="0.1" value="${ov.left}"></div>
+      </div>
+    </div>
+  `;
+  $('textsPanel').appendChild(wrap);
+
+  // fonts
+  const sel = wrap.querySelector('.sel_font');
+  sel.innerHTML = `<option value="">(Mặc định)</option>` + availableFonts
+    .map(f=>`<option value="${f}" ${ov.font===f?'selected':''}>${f}</option>`).join('');
+
+  // nút Thu gọn/Mở
+  const btnToggle = wrap.querySelector('.btn_toggle');
+  const setToggleLabel = () => { btnToggle.textContent = wrap.open ? 'Thu gọn' : 'Mở'; };
+  setToggleLabel();
+  btnToggle.addEventListener('click', (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    wrap.open = !wrap.open;
+    setToggleLabel();
+  });
+  wrap.addEventListener('toggle', setToggleLabel);
+
+  // Nhân bản / Xóa
+  wrap.querySelector('.btn_del').addEventListener('click', (e)=>{ e.stopPropagation(); removeOverlay(ov.id); });
+  wrap.querySelector('.btn_clone').addEventListener('click', (e)=>{ e.stopPropagation(); duplicateOverlay(ov.id); });
+
+  // cập nhật nội dung + preview tiêu đề
+  wrap.querySelectorAll('input,select').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      updateOverlayFromInputs(ov.id);
+      const row = document.getElementById('row_'+ov.id);
+      if(row){
+        const pv = row.querySelector('.preview');
+        if(pv){
+          const v = row.querySelector('.inp_text').value.trim() || 'VĂN BẢN';
+          pv.textContent = v.slice(0,30);
+        }
+      }
+    });
+  });
+}
+
+/* ===== Draggable (không nhảy) ===== */
+/* Text: neo mép trái + tâm dọc */
+function makeDraggableText(el, onDrop){
+  let drag=false, px=0, py=0, id=0;
+  el.addEventListener('pointerdown', ev=>{
+    ev.preventDefault(); drag=true; id=ev.pointerId; el.setPointerCapture(id);
+    px=ev.clientX; py=ev.clientY;
+  });
+  el.addEventListener('pointermove', ev=>{
+    if(!drag) return; ev.preventDefault();
+    const stage=$('stage').getBoundingClientRect();
+    const rect =el.getBoundingClientRect();
+    const dx=ev.clientX-px, dy=ev.clientY-py; px=ev.clientX; py=ev.clientY;
+    const newLeftPx = rect.left + dx;
+    const newCenterYPx = rect.top + rect.height/2 + dy;
+    const leftPct=((newLeftPx-stage.left)/stage.width)*100;
+    const topPct =((newCenterYPx-stage.top)/stage.height)*100;
+    el.style.left=Math.max(0,Math.min(100,leftPct))+'%';
+    el.style.top =Math.max(0,Math.min(100,topPct))+'%';
+  });
+  function end(ev){
+    if(!drag) return; drag=false; try{ el.releasePointerCapture(id);}catch{}
+    const stage=$('stage').getBoundingClientRect();
+    const rect=el.getBoundingClientRect();
+    const leftPct=((rect.left-stage.left)/stage.width)*100;
+    const topPct =((rect.top+rect.height/2-stage.top)/stage.height)*100;
+    onDrop?.(topPct,leftPct);
+  }
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+  el.addEventListener('pointerleave', end);
+}
+/* Avatar: neo tâm thật của #avatarBox */
+function makeDraggableCenter(el, onDrop){
+  let drag=false, px=0, py=0, id=0;
+  el.addEventListener('pointerdown', ev=>{
+    ev.preventDefault(); drag=true; id=ev.pointerId; el.setPointerCapture(id);
+    px=ev.clientX; py=ev.clientY;
+  });
+  el.addEventListener('pointermove', ev=>{
+    if(!drag) return; ev.preventDefault();
+    const stage=$('stage').getBoundingClientRect();
+    const rect =el.getBoundingClientRect();
+    const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+    const dx=ev.clientX-px, dy=ev.clientY-py; px=ev.clientX; py=ev.clientY;
+    const newCx=cx+dx, newCy=cy+dy;
+    const leftPct=((newCx-stage.left)/stage.width)*100;
+    const topPct =((newCy-stage.top)/stage.height)*100;
+    el.style.left=Math.max(0,Math.min(100,leftPct))+'%';
+    el.style.top =Math.max(0,Math.min(100,topPct))+'%';
+  });
+  function end(ev){
+    if(!drag) return; drag=false; try{ el.releasePointerCapture(id);}catch{}
+    const stage=$('stage').getBoundingClientRect();
+    const rect=el.getBoundingClientRect();
+    const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+    const leftPct=((cx-stage.left)/stage.width)*100;
+    const topPct =((cy-stage.top)/stage.height)*100;
+    onDrop?.(topPct,leftPct);
+  }
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+  el.addEventListener('pointerleave', end);
+}
+
+/* ===== Persist (localStorage) ===== */
+function persist(){
+  const cfg = {
+    imgWidth:$('imgWidth').value, globalOpacity:$('globalOpacity').value, overlays,
+    avatar:{
+      shown: getComputedStyle($('avatarBox')).display!=='none',
+      top:$('avatarTop').value, left:$('avatarLeft').value, width:$('avatarWidth').value,
+      opacity:$('avatarOpacity').value, bright:$('avatarBright').value, contrast:$('avatarContrast').value,
+      radius:$('avatarRadius').value, rotate:$('avatarRotate').value,
+      zoom:$('avatarZoom').value, feather:$('avatarFeather').value,
+      trim: $('avatarTrim').checked, trimThreshold: $('avatarTrimThreshold').value
+    }
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+}
+function restore(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+
+  try{
+    const c = JSON.parse(raw);
+
+    // Các thông số chung
+    if (c.imgWidth)      $('imgWidth').value = c.imgWidth;
+    if (c.globalOpacity) $('globalOpacity').value = c.globalOpacity;
+
+    // ===== TEXT OVERLAYS =====
+    if (Array.isArray(c.overlays)){
+      // xóa trạng thái cũ trên UI + DOM
+      overlays = [];
+      $('textsPanel').innerHTML = '';
+      document.querySelectorAll('.overlay').forEach(el => el.remove());
+      // tạo lại, mặc định đóng (false)
+      c.overlays.forEach(o => addOverlay(o, false));
+    }
+
+    // ===== IMAGE LAYERS (lớp phủ ảnh) =====
+    if (Array.isArray(c.imgLayers)){
+      imgLayers = [];
+      // xóa UI + DOM lớp phủ cũ (nếu có)
+      $('imgLayersPanel') && ($('imgLayersPanel').innerHTML = '');
+      document.querySelectorAll('.imgOverlay').forEach(el => el.remove());
+      // tạo lại, mặc định đóng (false)
+      c.imgLayers.forEach(L => addImgLayer(L, false));
+    }
+
+    // ===== AVATAR =====
+    if (c.avatar){
+      $('avatarTop').value       = c.avatar.top       ?? 20;
+      $('avatarLeft').value      = c.avatar.left      ?? 75;
+      $('avatarWidth').value     = c.avatar.width     ?? 18;
+      $('avatarOpacity').value   = c.avatar.opacity   ?? 100;
+      $('avatarBright').value    = c.avatar.bright    ?? 1;
+      $('avatarContrast').value  = c.avatar.contrast  ?? 1;
+      $('avatarRadius').value    = c.avatar.radius    ?? 10;
+      $('avatarRotate').value    = c.avatar.rotate    ?? 0;
+      $('avatarZoom').value      = c.avatar.zoom      ?? 100;
+      $('avatarFeather').value   = c.avatar.feather   ?? 0;
+      $('avatarTrim').checked    = !!c.avatar.trim;
+      $('avatarTrimThreshold').value = c.avatar.trimThreshold ?? 12;
+      if (c.avatar.shown) $('avatarBox').style.display = 'block';
+    }
+
+    // áp lại kích thước/opacity chữ + avatar
+    applyGlobals();
+    applyAvatar();
+
+  }catch(e){
+    console.warn('Restore error', e);
+  }
+}
+
+
+/* ===== Server save/load (JSON & CSS) ===== */
+async function listPresets(){
+  try{
+    const r=await fetch(`${API_BASE}/list_configs.php`,{cache:'no-store'});
+    const arr=await r.json();
+    const sel=$('presetSelect'); sel.innerHTML='<option value="">— Chọn preset trên host —</option>';
+    arr.forEach(name=>{ const o=document.createElement('option'); o.value=name; o.textContent=name; sel.appendChild(o); });
+  }catch(e){ console.warn('listPresets', e); }
+}
+function currentConfigObject(){
+  return {
+    imgWidth: $('imgWidth').value,
+    globalOpacity: $('globalOpacity').value,
+    overlays,
+    imgLayers, // ← THÊM DÒNG NÀY để lưu các lớp phủ ảnh
+    avatar: {
+      top: $('avatarTop').value,
+      left: $('avatarLeft').value,
+      width: $('avatarWidth').value,
+      opacity: $('avatarOpacity').value,
+      bright: $('avatarBright').value,
+      contrast: $('avatarContrast').value,
+      radius: $('avatarRadius').value,
+      rotate: $('avatarRotate').value,
+      zoom: $('avatarZoom').value,
+      feather: $('avatarFeather').value,
+      trim: $('avatarTrim').checked,
+      trimThreshold: $('avatarTrimThreshold').value
+    }
+  };
+}
+
+function currentCSS(){
+  const op=(+$('globalOpacity').value||90)/100;
+  const texts = overlays.map(o=>`
+/* ${o.id} */
+.overlay[data-id="${o.id}"]{
+  top:${o.top}%;
+  left:${o.left}%;
+  font-family:${o.font?'"'+o.font+'", ':''}Arial, sans-serif;
+  font-weight:${o.weight};
+  font-size:${o.size}px;
+  letter-spacing:${o.ls}px;
+  color:${o.color||'#000'};
+  opacity:${op};
+  filter: contrast(${(o.contrast ?? 1)}) blur(${o.blur}px); /* NEW: contrast */
+  transform:translate(0,-50%) rotate(${o.rot||0}deg);
+}`).join('\n');
+  const av = `
+#avatarBox{
+  top:${$('avatarTop').value}%;
+  left:${$('avatarLeft').value}%;
+  width:${$('avatarWidth').value}%;
+  border-radius:${$('avatarRadius').value}px;
+  transform:translate(-50%,-50%);
+}
+#avatar{
+  opacity:${(+$('avatarOpacity').value||100)/100};
+  filter:brightness(${ $('avatarBright').value||1 }) contrast(${ $('avatarContrast').value||1 });
+  transform:scale(${ (Math.max(10,+$('avatarZoom').value||100)/100) }) rotate(${ $('avatarRotate').value||0 }deg);
+}`;
+  return texts + '\n' + av + '\n';
+}
+$('saveServerBtn').addEventListener('click', async ()=>{
+  const name=$('presetName').value.trim(); if(!name){ alert('Nhập tên preset.'); return; }
+  try{
+    const r=await fetch(`${API_BASE}/save_config.php`,{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,data:currentConfigObject()})});
+    const j=await r.json(); if(j.success){ alert('Đã lưu JSON lên host.'); listPresets(); } else alert('Lưu thất bại.');
+  }catch{ alert('Lỗi kết nối khi lưu JSON.'); }
+});
+$('saveCssServerBtn').addEventListener('click', async ()=>{
+  const name=$('presetName').value.trim(); if(!name){ alert('Nhập tên preset.'); return; }
+  try{
+    const r=await fetch(`${API_BASE}/save_css.php`,{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, css:currentCSS()})});
+    const j=await r.json(); if(j.success){ alert('Đã lưu CSS lên host.'); } else alert('Lưu CSS thất bại.');
+  }catch{ alert('Lỗi kết nối khi lưu CSS.'); }
+});
+$('loadServerBtn').addEventListener('click', async ()=>{
+  const name = $('presetSelect').value;
+  if (!name) { alert('Chọn preset.'); return; }
+
+  try{
+    const r   = await fetch(`${API_BASE}/get_config.php?name=${encodeURIComponent(name)}`, {cache:'no-store'});
+    const cfg = await r.json();
+    if (!cfg || !cfg.overlays) { alert('Preset không hợp lệ.'); return; }
+
+    // Thông số chung
+    $('imgWidth').value      = cfg.imgWidth ?? 1200;
+    $('globalOpacity').value = cfg.globalOpacity ?? 90;
+
+    // TEXT overlays: clear + tạo lại (để trạng thái ĐÓNG/gọn)
+    overlays = [];
+    document.querySelectorAll('.overlay').forEach(el => el.remove());
+    $('textsPanel').innerHTML = '';
+    (cfg.overlays || []).forEach(o => addOverlay(o, false));
+
+    // IMG LAYERS (lớp phủ ảnh): clear + tạo lại
+    imgLayers = [];
+    document.querySelectorAll('.imgOverlay').forEach(el => el.remove());
+    if ($('imgLayersPanel')) $('imgLayersPanel').innerHTML = '';
+    (cfg.imgLayers || []).forEach(L => addImgLayer(L, false));
+
+    // AVATAR
+    if (cfg.avatar){
+      $('avatarTop').value       = cfg.avatar.top ?? 20;
+      $('avatarLeft').value      = cfg.avatar.left ?? 75;
+      $('avatarWidth').value     = cfg.avatar.width ?? 18;
+      $('avatarOpacity').value   = cfg.avatar.opacity ?? 100;
+      $('avatarBright').value    = cfg.avatar.bright ?? 1;
+      $('avatarContrast').value  = cfg.avatar.contrast ?? 1;
+      $('avatarRadius').value    = cfg.avatar.radius ?? 10;
+      $('avatarRotate').value    = cfg.avatar.rotate ?? 0;
+      $('avatarZoom').value      = cfg.avatar.zoom ?? 100;
+      $('avatarFeather').value   = cfg.avatar.feather ?? 0;
+      $('avatarTrim').checked    = !!cfg.avatar.trim;
+      $('avatarTrimThreshold').value = cfg.avatar.trimThreshold ?? 12;
+      $('avatarBox').style.display = 'block';
+    }
+
+    applyGlobals();
+    applyAvatar();
+    persist();
+    alert('Đã tải preset.');
+  }catch(e){
+    alert('Lỗi kết nối khi tải preset.');
+  }
+});
+
+
+/* ===== Bindings ===== */
+['imgWidth','globalOpacity'].forEach(id=> $(id).addEventListener('input', ()=>{ applyGlobals(); persist(); }));
+[
+  'avatarTop','avatarLeft','avatarWidth','avatarOpacity','avatarBright','avatarContrast',
+  'avatarRadius','avatarRotate','avatarZoom','avatarFeather','avatarTrim','avatarTrimThreshold'
+].forEach(id=> $(id).addEventListener('input', ()=>{ applyAvatar(); persist(); }));
+
+// nếu dùng document.getElementById:
+document.getElementById('addTextBtn').onclick = () => addOverlay({}, true);
+document.getElementById('addImgLayerBtn').onclick = () =>
+addImgLayer({ src: DEFAULT_IMG_LAYER_SRC }, true); // mở sẵn, có ảnh ngay
+/* ===== Init ===== */
+(async function init(){
+  await loadFonts();
+  applyGlobals();
+
+  // Lần đầu chạy (chưa có localStorage) => tạo 2 ô mẫu và MỞ sẵn
+  const firstRun = !localStorage.getItem(STORAGE_KEY);
+  if (firstRun) {
+    addOverlay({text:'HỌ VÀ TÊN', top:46, left:33, size:32, weight:700, ls:0.3}, true);
+    addOverlay({text:'01/01/2000', top:57, left:33, size:32, weight:700, ls:0.3}, true);
+  }
+
+  // Khôi phục cấu hình (các ô từ preset/localStorage sẽ được tạo ở trạng thái ĐÓNG)
+  restore();
+
+  // ===== Patch 5: bật chế độ gọn mặc định + chỉ mở 1 item mỗi lần =====
+  document.body.classList.add('compact');
+  $('textsPanel').addEventListener('toggle', (e)=>{
+    if (e.target.matches('details.item') && e.target.open && !e.altKey) {
+      document.querySelectorAll('#textsPanel details.item[open]').forEach(d=>{
+        if (d !== e.target) d.open = false;
+      });
+    }
+  });
+
+  // Kéo-thả avatar neo theo tâm (như cũ)
+  makeDraggableCenter($('avatarBox'), (top,left)=>{
+    $('avatarTop').value = top.toFixed(2);
+    $('avatarLeft').value= left.toFixed(2);
+    applyAvatar(); persist();
+  });
+
+  listPresets();
+})();
+
+
+// Thêm nút "Chế độ gọn" + "Mở tất cả" / "Thu gọn tất cả" ở hàng tiêu đề
+(function injectCompactToggles(){
+  const addBtn = $('addTextBtn');
+  if(!addBtn) return;
+  const row = addBtn.parentElement; // chính là hàng "Văn bản (nhiều lớp)"
+  const wrap = document.createElement('div');
+  wrap.className = 'row';
+  wrap.style.gap = '8px';
+  wrap.innerHTML = `
+    <label class="mini" style="margin:0;opacity:.8">Chế độ gọn</label>
+    <input id="toggleCompact" type="checkbox">
+    <button id="expandAll" class="btn ghost small" type="button">Mở tất cả</button>
+    <button id="collapseAll" class="btn ghost small" type="button">Thu gọn tất cả</button>
+  `;
+  row.appendChild(wrap);
+
+  $('toggleCompact').addEventListener('change', (e)=>{
+    document.body.classList.toggle('compact', e.target.checked);
+  });
+  $('expandAll').addEventListener('click', ()=>{
+    document.querySelectorAll('#textsPanel details.item').forEach(d=> d.open = true);
+  });
+  $('collapseAll').addEventListener('click', ()=>{
+    document.querySelectorAll('#textsPanel details.item').forEach(d=> d.open = false);
+  });
+})();
+
+
+
+
+    </script>
 </body>
+
 </html>
